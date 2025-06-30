@@ -4,6 +4,139 @@ This API provides authentication routes for registering an admin, logging in, an
 
 ---
 
+# 🚀 Job Portal API – Main Routing Overview
+
+This Express.js backend provides routes for employee registration/login, category/subcategory management, job postings, and payment verification.
+
+---
+
+## 🌐 Live Base URL
+
+```
+----->>> https://job-backend-uwzv.onrender.com  <<<<<<--------
+
+
+
+## 📂 API Routes Overview
+
+| Route Prefix       | Description                               |
+|--------------------|-------------------------------------------|
+| `/user`            | Employee registration and profile routes  |
+| `/employee`        | Login and password reset via OTP          |
+| `/category`        | Job category management                   |
+| `/subcategory`     | Job subcategory management                |
+| `/api`             | Job listings + payment verification       |
+
+---
+
+## 🧭 Route Details
+
+### 👤 `/user` – Employee Registration & Profile
+
+- `POST /user/register` – Register new employee  
+- `GET /user/profile/:id` – Get employee profile  
+
+---
+
+### 🔐 `/employee` – Login & OTP Reset
+
+- `POST /employee/login` – Login with email & password  
+- `POST /employee/send-otp` – Send OTP to email  
+- `POST /employee/reset-password` – Reset password using OTP  
+
+---
+
+### 📁 `/category` – Category Management
+
+- `GET /category/` – Get all categories  
+- `POST /category/` – Add new category  
+- `PUT /category/:id` – Update category  
+- `DELETE /category/:id` – Delete category  
+
+---
+
+### 📂 `/subcategory` – Subcategory Management
+
+- `GET /subcategory/` – Get all subcategories  
+- `POST /subcategory/` – Add new subcategory  
+- `PUT /subcategory/:id` – Update subcategory  
+- `DELETE /subcategory/:id` – Delete subcategory  
+
+---
+
+### 💼 `/api` – Job Management + Payment
+
+- `GET /api/` – Get all jobs  
+- `GET /api/:id` – Get job by ID  
+- `GET /api/category/:categoryId` – Jobs by category  
+- `GET /api/subcategory/:subcategoryId` – Jobs by subcategory  
+- `POST /api/` – Create new job (requires login)  
+- `PUT /api/:id` – Update job (requires login)  
+- `DELETE /api/:id` – Delete job (requires login)  
+
+---
+
+### 💳 Payment Verification
+
+> **Endpoint**:  
+> `POST /api/verify-payment`
+
+#### 🔸 Sample Request:
+
+```json
+{
+  "razorpay_payment_id": "pay_ABC123",
+  "razorpay_order_id": "order_DEF456",
+  "razorpay_signature": "signature_xyz789"
+}
+```
+
+#### ✅ Sample Success Response:
+
+```json
+{
+  "success": true,
+  "message": "Payment verified and job activated"
+}
+```
+
+---
+
+## ✅ Example Usage
+
+### 🔹 Register Employee
+
+```http
+POST https://job-backend-uwzv.onrender.com/user/register
+```
+
+### 🔹 Login
+
+```http
+POST https://job-backend-uwzv.onrender.com/employee/login
+```
+
+### 🔹 Create Job (Authenticated)
+
+```http
+POST https://job-backend-uwzv.onrender.com/api/
+Authorization: Bearer <token>
+```
+
+---
+
+## 🧪 Testing Tips
+
+Use **Postman** or **Thunder Client** to test all routes.
+
+---
+
+## 📬 Contact
+
+For issues or support, contact: [youremail@example.com](mailto:youremail@example.com)
+
+
+
 
 # 🚀 Express API – Main Routing Overview
 
