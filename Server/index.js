@@ -31,7 +31,8 @@ const UserEmployee = require("./Route/RegisterRoute");
 const UserEmployeelogin = require("./Route/EmployeeLoginRoute");
 const CategoryRoute = require("./Route/JobRoute/CategoryRoute");
 const SubCategoryRoute = require("./Route/JobRoute/subsubRoute");
-const jobRoute = require("./Route/JobRoute/JobRoute")
+const jobRoute = require("./Route/JobRoute/JobRoute");
+const jobapply = require("./Route/JobapplyRoute/JobapplyRoute")
 
 // app.use("/uploads", express.static("uploads"));
 mongoose.connect(process.env.MONGO_URI, {
@@ -51,7 +52,8 @@ app.use("/user", UserEmployee);
 app.use("/employee",UserEmployeelogin);
 app.use("/category", CategoryRoute)
 app.use("/subcategory", SubCategoryRoute);
-app.use("/api",jobRoute)
+app.use("/api",jobRoute);
+app.use("/jobapply", jobapply)
 
 
 
