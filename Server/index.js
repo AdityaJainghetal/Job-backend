@@ -16,10 +16,9 @@ app.use(morgan("tiny"));
 require("dotenv").config();
 app.use(
   cors({
-    origin: "*", // Allow all origins
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    origin: "http://localhost:5173",
     credentials:true,
-    allowedHeaders: ["Content-Type", "Authorization"],
+   
   })
 );
 // app.use(cors());
