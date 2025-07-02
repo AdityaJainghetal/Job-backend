@@ -48,4 +48,11 @@ router.post("/verify-payment", authenticate, jobController.verifyPayment);
 // Admin routes
 router.get("/admin/pending", authenticate, authorizeAdmin, jobController.getPendingJobs);
 
+
+
+router.get('/:id', jobController.getJobByIds);
+
+// POST apply to job
+router.post('/:id/apply',authenticate, jobController.applyToJob);
+
 module.exports = router;

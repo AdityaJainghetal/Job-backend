@@ -11,7 +11,7 @@ const RegisterEmployee = new mongoose.Schema({
     website: { type: String },
     location: { type: String, required: true },
     contactPerson: { type: String},
-    contactEmail: { type: String,unique: true, },
+    contactEmail: { type: String },
     contactPhone: { type: Number, required: true },
     password: { type: String, required: true },
     confirmPassword: { type: String, required: true },
