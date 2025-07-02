@@ -17,8 +17,7 @@ require("dotenv").config();
 app.use(
   cors({
     origin: "http://localhost:5173",
-    credentials:true,
-   
+    credentials: true,
   })
 );
 // app.use(cors());
@@ -44,10 +43,12 @@ let PORT = process.env.PORT || 8000;
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Body-parser middleware
-app.use(bodyparser.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(bodyparser.json());
+app.use(bodyparser.urlencoded({ extended: true }));
 
 app.use("/user", UserEmployee);
+
 app.use("/employee", UserEmployeelogin);
 app.use("/category", CategoryRoute);
 app.use("/subcategory", SubCategoryRoute);

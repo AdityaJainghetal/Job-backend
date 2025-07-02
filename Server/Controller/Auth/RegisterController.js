@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const imagekit = require("../../Utils/imageKit");
+const UserModule = require("../../Module/UserModule");
 
 const fileUpload = async (file) => {
   const buffer = file.data;
@@ -19,11 +20,10 @@ const fileUpload = async (file) => {
 };
 
 // Register Controller
+
 // const register = async (req, res) => {
 //   const {
 //     name,
-//     email,
-//     password,
 //     phone,
 //     dob,
 //     city,
@@ -33,29 +33,29 @@ const fileUpload = async (file) => {
 //     age,
 //     gender,
 //   } = req.body;
-//   const pdfFile = req.files?.pdfBrochure;
 
+//   const pdfFile = req.files?.pdfBrochure;
+//   console.log(req.body, "lkjhgfdsa");
 //   try {
-//     // Check if user exists
-//     const existingUser = await userModel.findOne({ email });
+//     // Check if user already exists by phone number
+//     const existingUser = await userModel.findOne({ phone });
 //     if (existingUser) {
 //       return res.status(400).json({
 //         success: false,
-//         message: "Email already in use",
+//         message: "Phone number already registered",
 //       });
 //     }
 
-//     // Hash password
-//     const salt = await bcrypt.genSalt(10);
-//     const hashedPassword = await bcrypt.hash(password, salt);
+//     // Hash the phone (used as password)
+//     // const salt = await bcrypt.genSalt(10);
+//     // const hashedPassword = await bcrypt.hash(phone, salt);
 
-//     // Upload PDF if exists
+//     // Upload PDF if provided
 //     const pdfUrl = pdfFile ? await fileUpload(pdfFile) : undefined;
 
 //     // Create user
 //     const user = await userModel.create({
 //       name,
-//       email,
 //       phone,
 //       dob,
 //       city,
@@ -64,18 +64,28 @@ const fileUpload = async (file) => {
 //       qualification,
 //       gender,
 //       skills,
-//       password: hashedPassword,
+//       // password: hashedPassword,
 //       pdfBrochure: pdfUrl,
 //     });
 
+//     // Generate JWT token
+//     const token = jwt.sign(
+//       { id: user._id, name: user.name, phone: user.phone },
+//       JWT_SECRET,
+//       { expiresIn: "10d" }
+//     );
+
+//     await user.save();
+
 //     res.status(201).json({
 //       success: true,
-//       message: "User registered successfully",
+//       message: "User registered and logged in successfully",
 //       user: {
 //         id: user._id,
 //         name: user.name,
 //         phone: user.phone,
 //       },
+//       token,
 //     });
 //   } catch (error) {
 //     console.error("Registration error:", error);
@@ -86,86 +96,6 @@ const fileUpload = async (file) => {
 //     });
 //   }
 // };
-
-
-
-
-
-const register = async (req, res) => {
-  const {
-    name,
-    phone, // phone will also be password
-    dob,
-    city,
-    qualification,
-    skills,
-    desgination,
-    age,
-    gender,
-  } = req.body;
-
-  const pdfFile = req.files?.pdfBrochure;
-
-  try {
-    // Check if user already exists by phone number
-    const existingUser = await userModel.findOne({ phone });
-    if (existingUser) {
-      return res.status(400).json({
-        success: false,
-        message: "Phone number already registered",
-      });
-    }
-
-    // Hash the phone number to use as password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(phone, salt);
-
-    // Upload PDF if present
-    const pdfUrl = pdfFile ? await fileUpload(pdfFile) : undefined;
-
-    // Create user
-    const user = await userModel.create({
-      name,
-      phone,
-      dob,
-      city,
-      age,
-      desgination,
-      qualification,
-      gender,
-      skills,
-      password: hashedPassword,
-      pdfBrochure: pdfUrl,
-    });
-
-    // Generate JWT token using name and phone
-    const token = jwt.sign(
-      { id: user._id, name: user.name, phone: user.phone },
-      JWT_SECRET,
-      { expiresIn: "10d" }
-    );
-
-    res.status(201).json({
-      success: true,
-      message: "User registered and logged in successfully",
-      user: {
-        id: user._id,
-        name: user.name,
-        phone: user.phone,
-      },
-      token,
-    });
-  } catch (error) {
-    console.error("Registration error:", error);
-    res.status(500).json({
-      success: false,
-      message: "Server error during registration",
-      error: error.message,
-    });
-  }
-};
-
-
 
 // Login Controller
 const login = async (req, res) => {
@@ -353,6 +283,43 @@ const resetPassword = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Server error occurred",
+      error: error.message,
+    });
+  }
+};
+
+const register = async (req, res) => {
+  try {
+    const { phone, name } = req.body;
+
+    // Validate input
+    if (!phone || !name) {
+      return res.status(400).json({ message: "Phone and name are required" });
+    }
+
+    // Check if user already exists
+    const existingUser = await UserModule.findOne({ name :name});
+
+    console.log(existingUser,"aaaaaaaaaaaaaaaaaaaaa")
+
+    if (existingUser) {
+      return res
+        .status(409)
+        .json({ message: "Phone number already registered" }); // 409 Conflict is more accurate
+    }
+
+    // Create and save new user
+    const newUser = new UserModule({ phone, name });
+    await newUser.save();
+
+    res.status(201).json({
+      message: "User registered successfully",
+      user: newUser,
+    });
+  } catch (error) {
+    console.error("Registration error:", error);
+    res.status(500).json({
+      message: "Server error during registration",
       error: error.message,
     });
   }
