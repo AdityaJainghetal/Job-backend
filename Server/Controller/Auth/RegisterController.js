@@ -5,6 +5,7 @@ const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const imagekit = require("../../Utils/imageKit");
 const UserModule = require("../../Module/UserModule");
+const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
 
 const fileUpload = async (file) => {
   const buffer = file.data;
@@ -288,6 +289,44 @@ const resetPassword = async (req, res) => {
   }
 };
 
+// const register = async (req, res) => {
+//   try {
+//     const { phone, name } = req.body;
+
+//     // Validate input
+//     if (!phone || !name) {
+//       return res.status(400).json({ message: "Phone and name are required" });
+//     }
+
+//     // Check if user already exists
+//     const existingUser = await UserModule.findOne({ name :name});
+
+//     console.log(existingUser,"aaaaaaaaaaaaaaaaaaaaa")
+
+//     if (existingUser) {
+//       return res
+//         .status(409)
+//         .json({ message: "Phone number already registered" }); // 409 Conflict is more accurate
+//     }
+
+//     // Create and save new user
+//     const newUser = new UserModule({ phone, name });
+//     await newUser.save();
+
+//     res.status(201).json({
+//       message: "User registered successfully",
+//       user: newUser,
+//     });
+//   } catch (error) {
+//     console.error("Registration error:", error);
+//     res.status(500).json({
+//       message: "Server error during registration",
+//       error: error.message,
+//     });
+//   }
+// };
+
+
 const register = async (req, res) => {
   try {
     const { phone, name } = req.body;
@@ -297,24 +336,30 @@ const register = async (req, res) => {
       return res.status(400).json({ message: "Phone and name are required" });
     }
 
-    // Check if user already exists
-    const existingUser = await UserModule.findOne({ name :name});
-
-    console.log(existingUser,"aaaaaaaaaaaaaaaaaaaaa")
+    // Check if user already exists (by phone)
+    const existingUser = await UserModule.findOne({ phone });
 
     if (existingUser) {
       return res
         .status(409)
-        .json({ message: "Phone number already registered" }); // 409 Conflict is more accurate
+        .json({ message: "Phone number already registered" });
     }
 
     // Create and save new user
     const newUser = new UserModule({ phone, name });
     await newUser.save();
 
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: newUser._id, phone: newUser.phone },
+      JWT_SECRET,
+      { expiresIn: "7d" } // Token valid for 7 days
+    );
+
     res.status(201).json({
       message: "User registered successfully",
       user: newUser,
+      token,
     });
   } catch (error) {
     console.error("Registration error:", error);
