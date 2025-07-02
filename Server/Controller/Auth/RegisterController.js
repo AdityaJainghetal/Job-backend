@@ -89,11 +89,12 @@ const fileUpload = async (file) => {
 
 
 
+
+
 const register = async (req, res) => {
   const {
     name,
-    email,
-    phone,  // Phone will be used as password
+    phone, // phone will also be password
     dob,
     city,
     qualification,
@@ -102,29 +103,29 @@ const register = async (req, res) => {
     age,
     gender,
   } = req.body;
+
   const pdfFile = req.files?.pdfBrochure;
 
   try {
-    // Check if user exists
-    const existingUser = await userModel.findOne({ email });
+    // Check if user already exists by phone number
+    const existingUser = await userModel.findOne({ phone });
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: "Email already in use",
+        message: "Phone number already registered",
       });
     }
 
-    // Use phone as password (no need to get password from req.body)
+    // Hash the phone number to use as password
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(phone, salt); // Hash the phone number
+    const hashedPassword = await bcrypt.hash(phone, salt);
 
-    // Upload PDF if exists
+    // Upload PDF if present
     const pdfUrl = pdfFile ? await fileUpload(pdfFile) : undefined;
 
     // Create user
     const user = await userModel.create({
       name,
-      email,
       phone,
       dob,
       city,
@@ -133,18 +134,26 @@ const register = async (req, res) => {
       qualification,
       gender,
       skills,
-      password: hashedPassword, // Store hashed phone as password
+      password: hashedPassword,
       pdfBrochure: pdfUrl,
     });
 
+    // Generate JWT token using name and phone
+    const token = jwt.sign(
+      { id: user._id, name: user.name, phone: user.phone },
+      JWT_SECRET,
+      { expiresIn: "10d" }
+    );
+
     res.status(201).json({
       success: true,
-      message: "User registered successfully",
+      message: "User registered and logged in successfully",
       user: {
         id: user._id,
         name: user.name,
         phone: user.phone,
       },
+      token,
     });
   } catch (error) {
     console.error("Registration error:", error);
@@ -155,6 +164,8 @@ const register = async (req, res) => {
     });
   }
 };
+
+
 
 // Login Controller
 const login = async (req, res) => {
