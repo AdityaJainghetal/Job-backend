@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const RegisterEmployee = new mongoose.Schema({
     name: { type: String },
-    email: { type: String,unique: true },
+    email: { type: String },
     companyName: { type: String, required: true },
     companySize: { type: Number, required: true },
 
@@ -11,7 +11,7 @@ const RegisterEmployee = new mongoose.Schema({
     website: { type: String },
     location: { type: String, required: true },
     contactPerson: { type: String},
-    contactEmail: { type: String},
+    contactEmail: { type: String,unique: true, },
     contactPhone: { type: Number, required: true },
     password: { type: String, required: true },
     confirmPassword: { type: String, required: true },
