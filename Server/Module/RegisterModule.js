@@ -10,7 +10,7 @@ const RegisterEmployee = new mongoose.Schema({
     industry: { type: String, required: true },
     website: { type: String },
     location: { type: String, required: true },
-    contactPerson: { type: Number},
+    contactPerson: { type: String},
     contactEmail: { type: String},
     contactPhone: { type: Number, required: true },
     password: { type: String, required: true },
