@@ -241,6 +241,7 @@ const createJob = async (req, res) => {
       jobpost,
       category,
       subCategory,
+      position,
     } = req.body;
 
     // Count how many jobs already posted by this company
@@ -266,10 +267,12 @@ const createJob = async (req, res) => {
       jobpost,
       status,
       responsibilities,
+      position,
       requirements,
       category,
       subCategory,
       pdfUrl,
+      
     });
 
     const savedJob = await newJob.save();
@@ -402,6 +405,32 @@ const getJobById = async (req, res) => {
 };
 
 // Update job by ID
+// const updateJob = async (req, res) => {
+//   try {
+//     const updates = req.body;
+//     let pdfUrl = null;
+
+//     // Handle PDF upload if exists in the update
+//     if (req.files && req.files.pdf) {
+//       pdfUrl = await fileUpload(req.files.pdf);
+//       updates.pdfUrl = pdfUrl;
+//     }
+
+//     const updatedJob = await Job.findByIdAndUpdate(req.params.id, updates, {
+//       new: true,
+//     })
+//       .populate("category")
+//       .populate("subCategory");
+
+//     if (!updatedJob) {
+//       return res.status(404).json({ message: "Job not found" });
+//     }
+//     res.status(200).json(updatedJob);
+//   } catch (error) {
+//     res.status(400).json({ message: error.message });
+//   }
+// };
+
 const updateJob = async (req, res) => {
   try {
     const updates = req.body;
@@ -411,6 +440,11 @@ const updateJob = async (req, res) => {
     if (req.files && req.files.pdf) {
       pdfUrl = await fileUpload(req.files.pdf);
       updates.pdfUrl = pdfUrl;
+    }
+
+    // Remove position from updates to prevent it from being modified
+    if (updates.position) {
+      delete updates.position;
     }
 
     const updatedJob = await Job.findByIdAndUpdate(req.params.id, updates, {

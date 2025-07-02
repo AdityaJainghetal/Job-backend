@@ -1,4 +1,4 @@
-const Employee = require("../../Module/UserModule");
+const Employee = require("../../Module/RegisterModule");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
@@ -50,6 +50,7 @@ const registerEmployee = async (req, res) => {
             contactPerson,
             contactEmail,
             contactPhone,
+            companySize,
             password,
             confirmPassword,
             hiringNeeds,
@@ -96,6 +97,7 @@ const registerEmployee = async (req, res) => {
             location,
             contactPerson,
             contactEmail,
+            companySize,
             contactPhone,
             password: hashedPassword,
             confirmPassword: hashedPassword,
