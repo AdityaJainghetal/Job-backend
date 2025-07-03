@@ -452,38 +452,39 @@ const getJobByIds = async (req, res) => {
 
 
 
-const applyToJob = async (req, res) => {
-  console.log(req.user,"aaaaaaaaaaaaaaaaa")
-  try {
-    const jobId = req.params.id;
-    const userId = req.user.id;
+// const applyToJob = async (req, res) => {
+//   console.log(req.user,"aaaaaaaaaaaaaaaaa")
+//   try {
+//     const jobId = req.params.id;
+//     const userId = req.user.id;
 
 
-    const job = await Job.findById(jobId);
-    if (!job) {
-      return res.status(404).json({ message: "Job not found" });
-    }
+//     const job = await Job.findById(jobId);
+//     if (!job) {
+//       return res.status(404).json({ message: "Job not found" });
+//     }
+//     console.log(jobId,'sssssssssssssssssss')
 
 
-    // Prevent duplicate applications
-    const existing = await Application.findOne({ job: jobId, user: userId });
-    if (existing) {
-      return res.status(400).json({ message: "You already applied to this job" });
-    }
+//     // Prevent duplicate applications
+//     const existing = await Application.findOne({ job: jobId, user: userId });
+//     if (existing) {
+//       return res.status(400).json({ message: "You already applied to this job" });
+//     }
 
-    const newApplication = new Application({
-      job: jobId,
-      user: userId,
-      appliedAt: new Date(),
-    });
+//     const newApplication = new Application({
+//       job: jobId,
+//       user: userId,
+//       appliedAt: new Date(),
+//     });
 
-    await newApplication.save();
+//     await newApplication.save();
 
-    res.status(200).json({ message: "Application submitted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+//     res.status(200).json({ message: "Application submitted successfully" });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
 
 
 
@@ -513,6 +514,36 @@ const applyToJob = async (req, res) => {
 //     res.status(400).json({ message: error.message });
 //   }
 // };
+
+const applyToJob = async (req, res) => {
+  try {
+    const jobId = req.params.id;
+    const userId = req.user.userId || req.user.id; // depending on your token payload
+
+    const job = await Job.findById(jobId);
+    if (!job) {
+      return res.status(404).json({ message: "Job not found" });
+    }
+
+    const existing = await Application.findOne({ job: jobId, user: userId });
+    if (existing) {
+      return res.status(400).json({ message: "You already applied to this job" });
+    }
+
+    const newApplication = new Application({
+      job: jobId,
+      user: userId,
+    });
+
+    await newApplication.save();
+
+    res.status(200).json({ message: "Application submitted successfully" });
+  } catch (error) {
+    console.error("Apply Error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 const updateJob = async (req, res) => {
   try {

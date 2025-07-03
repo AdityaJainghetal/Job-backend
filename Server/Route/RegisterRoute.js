@@ -4,10 +4,10 @@ const router = express.Router();
 
 router.post("/register", AdminModel.register);
 
+// router.post("/registerpotal", AdminModel.registerpostal);
+// router.post("/loginportal", AdminModel.loginpostal)
+
 router.post("/login", AdminModel.login);
 
-router.post("/resetpassword", AdminModel.resetPassword);
-
-router.get("/reset-password/:id", AdminModel.forgotPassword);
 
 module.exports = router;
