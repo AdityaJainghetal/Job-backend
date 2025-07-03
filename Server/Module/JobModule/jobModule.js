@@ -59,7 +59,7 @@ const jobSchema = new mongoose.Schema({
     required: true,
   },
   deadline: {
-    type: Date,
+    type: String,
     required: true,
   },
   description: {
@@ -75,7 +75,7 @@ const jobSchema = new mongoose.Schema({
     default: [],
   },
   jobpost: {
-    type: String,
+    type: Number,
     required: true,
   },
   category: {
@@ -85,6 +85,10 @@ const jobSchema = new mongoose.Schema({
   subCategory: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "SubCategory",
+  },
+  user:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"User"
   },
   pdfUrl: {
     type: String,

@@ -328,33 +328,95 @@ const createJob = async (req, res) => {
 };
 
 // Verify payment and update job status
+// const verifyPayment = async (req, res) => {
+//   try {
+//     const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
+
+//     // Verify the payment signature
+//     const crypto = require('crypto');
+//     const hmac = crypto.createHmac('sha256', razorpay.key_secret);
+//     hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
+//     const generatedSignature = hmac.digest('hex');
+
+//     if (generatedSignature !== razorpay_signature) {
+//       return res.status(400).json({ success: false, message: "Invalid payment signature" });
+//     }
+
+//     // Find the order in our database
+//     const order = await Order.findOne({ orderId: razorpay_order_id });
+//     if (!order) {
+//       return res.status(404).json({ success: false, message: "Order not found" });
+//     }
+
+//     // Update the order status
+//     order.status = 'paid';
+//     order.paymentId = razorpay_payment_id;
+//     order.signature = razorpay_signature;
+//     await order.save();
+
+//     // Update the job status to approved
+//     const updatedJob = await Job.findByIdAndUpdate(
+//       order.jobId,
+//       { status: 'approved' },
+//       { new: true }
+//     );
+
+//     res.status(200).json({
+//       success: true,
+//       message: "Payment verified and job approved",
+//       job: updatedJob,
+//       order
+//     });
+//   } catch (error) {
+//     console.error("Error verifying payment:", error);
+//     res.status(500).json({ success: false, message: error.message });
+//   }
+// };
 const verifyPayment = async (req, res) => {
   try {
     const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
 
-    // Verify the payment signature
-    const crypto = require('crypto');
-    const hmac = crypto.createHmac('sha256', razorpay.key_secret);
-    hmac.update(razorpay_order_id + "|" + razorpay_payment_id);
-    const generatedSignature = hmac.digest('hex');
 
+    // Validate request fields
+    if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
+      return res.status(400).json({
+        
+        success: false,
+        message: "Missing Razorpay payment details"
+      });
+    }
+    
+
+    // Generate expected signature using your secret key
+    const generatedSignature = crypto
+      .createHmac('sha256', process.env.KEY_SECRET) // Use env variable for security
+      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .digest('hex');
+
+    // Verify signature
     if (generatedSignature !== razorpay_signature) {
-      return res.status(400).json({ success: false, message: "Invalid payment signature" });
+      return res.status(400).json({
+        success: false,
+        message: "Invalid payment signature"
+      });
     }
 
-    // Find the order in our database
+    // Find the order in the DB
     const order = await Order.findOne({ orderId: razorpay_order_id });
     if (!order) {
-      return res.status(404).json({ success: false, message: "Order not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Order not found"
+      });
     }
 
-    // Update the order status
+    // Update the order
     order.status = 'paid';
     order.paymentId = razorpay_payment_id;
     order.signature = razorpay_signature;
     await order.save();
 
-    // Update the job status to approved
+    // Approve the associated job
     const updatedJob = await Job.findByIdAndUpdate(
       order.jobId,
       { status: 'approved' },
@@ -369,7 +431,11 @@ const verifyPayment = async (req, res) => {
     });
   } catch (error) {
     console.error("Error verifying payment:", error);
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: error.message
+    });
   }
 };
 
@@ -385,6 +451,24 @@ const getAllJobs = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+
+const getAllJobsbyEmployee = async (req, res) => {
+  try {
+    // Find jobs where the user is the logged-in user
+    const jobs = await Job.find({ user: req.user.id })
+    console.log(req.user,"aaaaaaaaaaaaaaaaaaaaaaaaid")
+      .populate("category")
+      .populate("subCategory");
+
+      
+      res.status(200).json(jobs);
+      console.log(jobs,"jobsssssssssssssssssssss")
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 // Get job by ID
 const getJobById = async (req, res) => {
@@ -547,6 +631,65 @@ const applyToJob = async (req, res) => {
 };
 
 
+const getPostedJobsWithApplicants = async (req, res) => {
+  try {
+    const userId = req.user._id || req.user.id || req.user.userId;
+    console.log("User ID:", userId);
+
+    // ✅ Populate category and subCategory to get full job info
+    const jobs = await Job.find({ user: userId })
+      .populate("category")
+      .populate("subCategory");
+
+      
+      const jobApplications = await Promise.all(
+        jobs.map(async (job) => {
+          const applications = await Application.find({ job: job._id }).populate("user");
+          console.log(`Applications for job ${job.title}:`, applications);
+          
+          return {
+            jobId: job.id,
+            title: job.title,
+            company: job.company,
+            location: job.location,
+            phone: job.phone,
+            salaryMin: job.salaryMin,
+            salaryMax: job.salaryMax,
+            experience: job.experience,
+            deadline: job.deadline,
+            description: job.description,
+            responsibilities: job.responsibilities,
+            requirements: job.requirements,
+            jobpost: job.jobpost,
+            category: job.category,
+            subCategory: job.subCategory,
+            pdfUrl: job.pdfUrl,
+          status: job.status,
+          totalApplications: applications.length,
+          applicants: applications.map((app) => ({
+            userId: app.user?._id,
+            name: app.user?.name,
+            email: app.user?.email,
+            phone: app.user?.phone,
+            appliedAt: app.createdAt,
+          })),
+        };
+      })
+    );
+    console.log("Jobs found:", jobApplications);
+
+    res.status(200).json({
+      success: true,
+      data: jobApplications,
+    });
+  } catch (error) {
+    console.error("Error fetching posted jobs with applicants:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+
 const updateJob = async (req, res) => {
   try {
     const updates = req.body;
@@ -652,6 +795,8 @@ module.exports = {
   getJobsBySubcategory,
   getPendingJobs,
   getJobByIds,
-  applyToJob
+  applyToJob,
+  getAllJobsbyEmployee,
+  getPostedJobsWithApplicants
 
 };
