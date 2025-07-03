@@ -42,6 +42,10 @@ const jobSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  phone:{
+    type:Number,
+    required:true
+  },
   salaryMin: {
     type: Number,
     required: true,

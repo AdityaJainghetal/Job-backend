@@ -9,5 +9,7 @@ router.post("/register", AdminModel.register);
 
 router.post("/login", AdminModel.login);
 
+router.post('/registeruser',AdminModel.registeruser)
+router.post("/loginOrRegister", AdminModel.loginOrRegister)
 
 module.exports = router;
