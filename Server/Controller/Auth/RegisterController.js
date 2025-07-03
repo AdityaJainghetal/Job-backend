@@ -201,20 +201,68 @@ const register = async (req, res) => {
 };
 
 // Login Function
+// const login = async (req, res) => {
+//   try {
+//     const { name, password, phone } = req.body;
+
+//     if (!name || !password) {
+//       return res.status(400).json({ success: false, message: "Name and password are required" });
+//     }
+
+//     const user = await userModel.findOne({ phone });
+//     if (!user) {
+//       return res.status(404).json({ success: false, message: "User not found" });
+//     }
+
+//     const isMatch = await bcrypt.compare(password, user.password);
+//     if (!isMatch) {
+//       return res.status(401).json({ success: false, message: "Invalid credentials" });
+//     }
+
+//     // Create JWT token
+//     const token = jwt.sign(
+//       { userId: user._id, name: user.name, phone: user.phone },
+//       process.env.JWT_SECRET || "your_jwt_secret",
+//       { expiresIn: "7d" }
+//     );
+
+//     res.status(200).json({
+//       success: true,
+//       message: "Login successful",
+//       token,
+//       user: {
+//         name: user.name,
+//         phone: user.phone
+//       }
+//     });
+
+//   } catch (error) {
+//     console.error("Login error:", error);
+//     res.status(500).json({ success: false, message: "Server error" });
+//   }
+// };
+
 const login = async (req, res) => {
   try {
-    const { name, password, phone } = req.body;
+    const { name, phone } = req.body;
 
-    if (!name || !password) {
-      return res.status(400).json({ success: false, message: "Name and password are required" });
+    if (!name || !phone) {
+      return res.status(400).json({ success: false, message: "Name and phone are required" });
     }
 
+    // Find user by phone number
     const user = await userModel.findOne({ phone });
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    // Match name
+    if (user.name !== name) {
+      return res.status(401).json({ success: false, message: "Invalid credentials" });
+    }
+
+    // Compare phone as password (hashed)
+    const isMatch = await bcrypt.compare(phone, user.password);
     if (!isMatch) {
       return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
