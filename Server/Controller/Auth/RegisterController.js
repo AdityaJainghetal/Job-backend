@@ -99,12 +99,135 @@ const fileUpload = async (file) => {
 // };
 
 // Login Controller
+// const login = async (req, res) => {
+//   const { phone, password } = req.body; // Now expecting phone and password separately
+
+//   try {
+//     // Find user by phone number
+//     const user = await userModel.findOne({ phone });
+//     if (!user) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "User not found",
+//       });
+//     }
+
+//     // Compare provided password with stored hash
+//     const isMatch = await bcrypt.compare(password, user.password);
+//     if (!isMatch) {
+//       return res.status(401).json({
+//         success: false,
+//         message: "Invalid password",
+//       });
+//     }
+
+//     // Generate JWT token
+//     const token = jwt.sign(
+//       {
+//         id: user._id,
+//         name: user.name,
+//         phone: user.phone,
+//       },
+//       process.env.JWT_SECRET || "Adityajain@1234",
+//       { expiresIn: "1d" }
+//     );
+
+//     res.status(200).json({
+//       success: true,
+//       message: "Login successful",
+//       token,
+//       user: {
+//         id: user._id,
+//         name: user.name,
+//         phone: user.phone,
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Login error:", error);
+//     res.status(500).json({
+//       success: false,
+//       message: "Server error during login",
+//       error: error.message,
+//     });
+//   }
+// };
+
+// const login = async (req, res) => {
+//   const { phone, name } = req.body;
+
+//   try {
+//     // Find user by phone number
+//     const user = await userModel.findOne({ phone });
+
+//     if (!user) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "User not found",
+//       });
+//     }
+
+//     // Check if name matches
+//     if (user.name !== name) {
+//       return res.status(401).json({
+//         success: false,
+//         message: "Invalid name",
+//       });
+//     }
+
+//     // Debug logs
+//     console.log("🔐 Raw phone (used as password):", phone);
+//     console.log("🔐 Hashed password from DB:", user.password);
+
+//     // Password logic: phone number is treated as password
+//     const isMatch = await bcrypt.compare(phone, user.password);
+
+//     console.log("✅ Password match result:", isMatch);
+
+//     if (!isMatch) {
+//       return res.status(401).json({
+//         success: false,
+//         message: "Invalid password",
+//       });
+//     }
+
+//     // Generate JWT token
+//     const token = jwt.sign(
+//       {
+//         id: user._id,
+//         name: user.name,
+//         phone: user.phone,
+//       },
+//       process.env.JWT_SECRET || "your_jwt_secret_key",
+//       { expiresIn: "1d" }
+//     );
+
+//     res.status(200).json({
+//       success: true,
+//       message: "Login successful",
+//       token,
+//       user: {
+//         id: user._id,
+//         name: user.name,
+//         phone: user.phone,
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Login error:", error);
+//     res.status(500).json({
+//       success: false,
+//       message: "Server error during login",
+//       error: error.message,
+//     });
+//   }
+// };
+
+
 const login = async (req, res) => {
-  const { phone, password } = req.body; // Now expecting phone and password separately
+  const { name, password } = req.body;
 
   try {
-    // Find user by phone number
-    const user = await userModel.findOne({ phone });
+    const user = await userModel.findOne({ name });
+
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -112,14 +235,29 @@ const login = async (req, res) => {
       });
     }
 
-    // Compare provided password with stored hash
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({
+    console.log("🔐 Entered password (phone number):", password);
+    console.log("📞 User phone:", user.phone);
+    console.log("🔐 Stored hash:", password);
+
+    // Check for missing values
+    if (!password || !password) {
+      console.error("❌ Missing password or stored hashed password");
+      return res.status(400).json({
         success: false,
-        message: "Invalid password",
+        message: "Password or stored hash is missing",
       });
     }
+
+    // // Compare password
+    // const isMatch = await bcrypt.compare(password, password);
+    // console.log("✅ Password match:", isMatch);
+
+    // if (!isMatch) {
+    //   return res.status(401).json({
+    //     success: false,
+    //     message: "Invalid password",
+    //   });
+    // }
 
     // Generate JWT token
     const token = jwt.sign(
@@ -128,7 +266,7 @@ const login = async (req, res) => {
         name: user.name,
         phone: user.phone,
       },
-      process.env.JWT_SECRET || "Adityajain@1234",
+      JWT_SECRET,
       { expiresIn: "1d" }
     );
 
@@ -151,6 +289,70 @@ const login = async (req, res) => {
     });
   }
 };
+
+
+// const login = async (req, res) => {
+//   const { name, password } = req.body; // password === phone
+
+//   try {
+//     const user = await UserModule.findOne({ name });
+
+//     if (!user) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "User not found",
+//       });
+//     }
+
+//     console.log("🔐 Entered password (phone):", password);
+//     console.log("🔐 Stored hashed password:", user.password);
+
+//     if (!password || !user.password) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Password or stored hash is missing",
+//       });
+//     }
+
+//     const isMatch = await bcrypt.compare(password, user.password);
+
+//     if (!isMatch) {
+//       return res.status(401).json({
+//         success: false,
+//         message: "Invalid password",
+//       });
+//     }
+
+//     const token = jwt.sign(
+//       {
+//         id: user._id,
+//         name: user.name,
+//         phone: user.phone,
+//       },
+//       JWT_SECRET,
+//       { expiresIn: "1d" }
+//     );
+
+//     res.status(200).json({
+//       success: true,
+//       message: "Login successful",
+//       token,
+//       user: {
+//         id: user._id,
+//         name: user.name,
+//         phone: user.phone,
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Login error:", error);
+//     res.status(500).json({
+//       success: false,
+//       message: "Server error during login",
+//       error: error.message,
+//     });
+//   }
+// };
+
 
 const forgotPassword = async (req, res) => {
   try {
@@ -327,6 +529,106 @@ const resetPassword = async (req, res) => {
 // };
 
 
+// const register = async (req, res) => {
+//   try {
+//     const { phone, name } = req.body;
+
+//     // Validate input
+//     if (!phone || !name) {
+//       return res.status(400).json({ message: "Phone and name are required" });
+//     }
+
+//     // Check if user already exists (by phone)
+//     const existingUser = await UserModule.findOne({ phone });
+
+//     if (existingUser) {
+//       return res
+//         .status(409)
+//         .json({ message: "Phone number already registered" });
+//     }
+
+//     // Create and save new user
+//     const newUser = new UserModule({ phone, name });
+//     await newUser.save();
+
+//     // Generate JWT token
+//     const token = jwt.sign(
+//       { userId: newUser._id, phone: newUser.phone },
+//       JWT_SECRET,
+//       { expiresIn: "7d" } // Token valid for 7 days
+//     );
+
+//     res.status(201).json({
+//       message: "User registered successfully",
+//       user: newUser,
+//       token,
+//     });
+//   } catch (error) {
+//     console.error("Registration error:", error);
+//     res.status(500).json({
+//       message: "Server error during registration",
+//       error: error.message,
+//     });
+//   }
+// };
+
+// const register = async (req, res) => {
+//   try {
+//     const { phone, name } = req.body;
+
+//     // Validate input
+//     if (!phone || !name) {
+//       return res.status(400).json({ message: "Phone and name are required" });
+//     }
+
+//     // Check if user already exists (by phone)
+//     const existingUser = await UserModule.findOne({ phone });
+//     if (existingUser) {
+//       return res
+//         .status(409)
+//         .json({ message: "Phone number already registered" });
+//     }
+
+//     // Hash the phone number to use as password
+//     const hashedPassword = await bcrypt.hash(phone, 10);
+
+//     console.log("📞 Phone (raw password):", phone);
+//     console.log("🔐 Hashed password:", hashedPassword);
+
+//     // Create and save new user with hashed password
+//     const newUser = new UserModule({
+//       phone,
+//       name,
+//       password: hashedPassword,
+//     });
+
+//     await newUser.save();
+
+//     // Generate JWT token
+//     const token = jwt.sign(
+//       { userId: newUser._id, phone: newUser.phone },
+//       JWT_SECRET,
+//       { expiresIn: "7d" }
+//     );
+
+//     res.status(201).json({
+//       message: "User registered successfully",
+//       user: {
+//         id: newUser._id,
+//         name: newUser.name,
+//         phone: newUser.phone,
+//       },
+//       token,
+//     });
+//   } catch (error) {
+//     console.error("Registration error:", error);
+//     res.status(500).json({
+//       message: "Server error during registration",
+//       error: error.message,
+//     });
+//   }
+// };
+
 const register = async (req, res) => {
   try {
     const { phone, name } = req.body;
@@ -338,27 +640,41 @@ const register = async (req, res) => {
 
     // Check if user already exists (by phone)
     const existingUser = await UserModule.findOne({ phone });
-
     if (existingUser) {
       return res
         .status(409)
         .json({ message: "Phone number already registered" });
     }
 
-    // Create and save new user
-    const newUser = new UserModule({ phone, name });
+    // Hash the phone number to use as password
+    const hashedPassword = await bcrypt.hash(phone, 10);
+
+    console.log("📞 Phone (raw password):", phone);
+    console.log("🔐 Hashed password:", hashedPassword);
+
+    // Create and save new user with hashed password
+    const newUser = new UserModule({
+      phone,
+      name,
+      password: hashedPassword,
+    });
+
     await newUser.save();
 
     // Generate JWT token
     const token = jwt.sign(
       { userId: newUser._id, phone: newUser.phone },
       JWT_SECRET,
-      { expiresIn: "7d" } // Token valid for 7 days
+      { expiresIn: "7d" }
     );
 
     res.status(201).json({
       message: "User registered successfully",
-      user: newUser,
+      user: {
+        id: newUser._id,
+        name: newUser.name,
+        phone: newUser.phone,
+      },
       token,
     });
   } catch (error) {
