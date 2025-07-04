@@ -792,18 +792,223 @@ app.use("/api", paymentRoute);     // All payment-related routes under /api
 
 
 
+## Contact
+
+
+
+| Method | Endpoint            | Description        |
+| ------ | ------------------- | ------------------ |
+| POST   | `/contacts`     | Create new contact |
+| GET    | `/contacts`     | Get all contacts   |
+| GET    | `/contacts/:id` | Get one contact    |
+| PUT    | `/contacts/:id` | Update contact     |
+| DELETE | `/contacts/:id` | Delete contact     |
 
 
 
 
 
 
+import axios from 'axios';
+const BASE = process.env.REACT_APP_JOB_API + '/contacts';
+
+export const createContact = (data) => axios.post(`${BASE}`, data);
+export const getAllContacts = () => axios.get(`${BASE}`);
+export const getContactById = (id) => axios.get(`${BASE}/${id}`);
+export const updateContact = (id, data) => axios.put(`${BASE}/${id}`, data);
+export const deleteContact = (id) => axios.delete(`${BASE}/${id}`);
 
 
 
 
+# 🖥️ Job Management System – Frontend
 
+A frontend platform for managing and applying to job postings. Connected to a Node.js/Express backend with RESTful APIs. Supports categories, subcategories, user authentication, admin access, Razorpay payments, and contact form submissions.
 
+---
+
+## 🎯 Features
+
+* 📅 Post new jobs (authenticated)
+* 📋 View all jobs (public)
+* 🔍 Filter jobs by category and subcategory
+* ✍️ Apply to a job (user only)
+* 🔐 Admin dashboard for job approval
+* ✨ File (PDF) upload support
+* 💳 Razorpay payment integration for job posts
+* 📨 Contact form with full CRUD capability (admin panel)
+
+---
+
+## ⚙️ Tech Stack
+
+* React.js
+* Axios for API calls
+* Tailwind CSS or Bootstrap
+* JWT for auth (via backend)
+* Toast/Alerts for notifications
+
+---
+
+## 📁 Folder Structure
+
+```
+src/
+├── pages/
+│   ├── JobList.js
+│   ├── JobDetail.js
+│   ├── PostJob.js
+│   ├── MyJobs.js
+│   ├── PaymentConfirm.js
+│   └── ContactList.js
+│
+├── components/
+│   ├── JobCard.js
+│   ├── JobForm.js
+│   ├── JobFilters.js
+│   └── ContactCard.js
+│
+├── services/
+│   ├── jobService.js
+│   ├── paymentService.js
+│   └── contactService.js
+├── App.js
+└── index.js
+```
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone and Install
+
+```bash
+git clone <your-frontend-repo-url>
+cd job-frontend
+npm install
+```
+
+### 2. Add Environment Variables
+
+```env
+REACT_APP_JOB_API=http://localhost:5000/api
+```
+
+### 3. Start React App
+
+```bash
+npm start
+```
+
+---
+
+## 🔌 API Integration
+
+### jobService.js & paymentService.js – same as before
+
+### contactService.js:
+
+```js
+import axios from 'axios';
+const BASE = process.env.REACT_APP_JOB_API + '/contacts';
+
+export const createContact = (data) => axios.post(`${BASE}`, data);
+export const getAllContacts = () => axios.get(`${BASE}`);
+export const getContactById = (id) => axios.get(`${BASE}/${id}`);
+export const updateContact = (id, data) => axios.put(`${BASE}/${id}`, data);
+export const deleteContact = (id) => axios.delete(`${BASE}/${id}`);
+```
+
+---
+
+## 🚧 Contact Form Example
+
+```js
+function ContactForm() {
+  const [form, setForm] = useState({ fullName: '', yourName: '', emailAddress: '', subject: '', message: '' });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await createContact(form);
+      alert("Message sent successfully");
+      setForm({ fullName: '', yourName: '', emailAddress: '', subject: '', message: '' });
+    } catch (err) {
+      alert("Error sending message");
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} placeholder="Full Name" required />
+      <input value={form.emailAddress} onChange={(e) => setForm({ ...form, emailAddress: e.target.value })} placeholder="Email Address" required />
+      <input value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} placeholder="Subject" required />
+      <textarea value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder="Message" required />
+      <button type="submit">Send</button>
+    </form>
+  );
+}
+```
+
+---
+
+## 📅 Contact Schema (Backend Model)
+
+```js
+const ContactSchema = new mongoose.Schema({
+  fullName: { type: String, required: true, trim: true },
+  yourName: { type: String, trim: true },
+  emailAddress: {
+    type: String,
+    required: true,
+    trim: true,
+    lowercase: true,
+    match: [/^\w+([\.+-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please fill a valid email address']
+  },
+  subject: { type: String, required: true, trim: true },
+  message: { type: String, required: true, trim: true }
+}, { timestamps: true });
+```
+
+---
+
+## ❌ Error Handling (Frontend)
+
+| Scenario       | Message                              | Status   |
+| -------------- | ------------------------------------ | -------- |
+| Missing fields | "Please fill all fields"             | Frontend |
+| Invalid email  | "Please enter a valid email address" | Frontend |
+| Server error   | "Something went wrong"               | 500      |
+
+---
+
+## 🔗 Backend Route Entry
+
+In `app.js`:
+
+```js
+app.use("/api", jobRoute);         // All job-related routes
+app.use("/api", paymentRoute);     // All payment-related routes under /api
+app.use("/contacts", contactRoute); // Contact form routes
+```
+
+### `/contacts` Routes
+
+* `POST /contacts` – Submit contact form
+* `GET /contacts` – Get all messages (admin)
+* `GET /contacts/:id` – View single message
+* `PUT /contacts/:id` – Update message
+* `DELETE /contacts/:id` – Delete message
+
+---
+
+## 💡 Future Ideas
+
+* Razorpay refund API
+* OTP + email verification
+* Auto-payment success redirect
+* UI for payment history
+* Admin UI for managing contact queries
 
 
 

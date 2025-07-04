@@ -32,6 +32,8 @@ const CategoryRoute = require("./Route/JobRoute/CategoryRoute");
 const SubCategoryRoute = require("./Route/JobRoute/subsubRoute");
 const jobRoute = require("./Route/JobRoute/JobRoute");
 const jobapply = require("./Route/JobapplyRoute/JobapplyRoute");
+const contactRoute = require("./Route/ContactRoute/ContactRoute");
+const AdminRoute = require("./Route/Admin/AdminRoute")
 
 // app.use("/uploads", express.static("uploads"));
 mongoose.connect(process.env.MONGO_URI, {
@@ -54,6 +56,8 @@ app.use("/category", CategoryRoute);
 app.use("/subcategory", SubCategoryRoute);
 app.use("/api", jobRoute);
 app.use("/jobapply", jobapply);
+app.use("/contacts", contactRoute)
+app.use("/admin", AdminRoute);
 
 app.listen(PORT, function (error) {
   if (error) throw error;

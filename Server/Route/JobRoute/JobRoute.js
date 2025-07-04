@@ -38,7 +38,7 @@ router.get("/category/:categoryId", jobController.getJobsByCategory);
 router.get("/subcategory/:subcategoryId", jobController.getJobsBySubcategory);
 
 // Protected routes (require authentication)
-router.post("/", authenticate, jobController.createJob);
+router.post("/", jobController.createJob);
 router.put("/:id", authenticate, jobController.updateJob);
 router.delete("/:id", authenticate, jobController.deleteJob);
 
@@ -46,7 +46,7 @@ router.delete("/:id", authenticate, jobController.deleteJob);
 router.post("/verify-payment", authenticate, jobController.verifyPayment);
 
 // Admin routes
-router.get("/admin/pending", authenticate, authorizeAdmin, jobController.getPendingJobs);
+router.get("/admin/pending", authenticate,  jobController.getPendingJobs);
 
 router.get("/getjob",authenticate, jobController.getAllJobsbyEmployee)
 

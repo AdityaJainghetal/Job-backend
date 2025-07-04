@@ -205,6 +205,8 @@ const imagekit = require("../../Utils/imageKit");
 const Razorpay = require('razorpay');
 const Order = require('../../Module/JobModule/PaymentusersModule');
 // const Job = require("../models/Job");
+const crypto = require('crypto'); // ✅ add this at top
+
 const Application = require("../../Module/ApplicationModule/ApplicationModule"); 
 // Initialize Razorpay
 const razorpay = new Razorpay({
@@ -388,10 +390,11 @@ const verifyPayment = async (req, res) => {
     
 
     // Generate expected signature using your secret key
-    const generatedSignature = crypto
-      .createHmac('sha256', process.env.KEY_SECRET) // Use env variable for security
-      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
-      .digest('hex');
+   const generatedSignature = crypto
+  .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+  .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+  .digest('hex');
+
 
     // Verify signature
     if (generatedSignature !== razorpay_signature) {
@@ -411,10 +414,18 @@ const verifyPayment = async (req, res) => {
     }
 
     // Update the order
+    // order.status = 'paid';
+    // order.paymentId = razorpay_payment_id;
+    // order.signature = razorpay_signature;
+    // await order.save();
     order.status = 'paid';
-    order.paymentId = razorpay_payment_id;
-    order.signature = razorpay_signature;
-    await order.save();
+order.paymentId = razorpay_payment_id;
+order.signature = razorpay_signature;
+await order.save();
+
+// Update job
+await Job.findByIdAndUpdate(order.jobId, { status: 'approved' }, { new: true });
+
 
     // Approve the associated job
     const updatedJob = await Job.findByIdAndUpdate(
@@ -601,14 +612,87 @@ const getJobByIds = async (req, res) => {
 //   }
 // };
 
+// const applyToJob = async (req, res) => {
+//   try {
+//     const jobId = req.params.id;
+//     const userId = req.user.userId || req.user.id; // depending on your token payload
+
+//     const job = await Job.findById(jobId);
+//     if (!job) {
+//       return res.status(404).json({ message: "Job not found" });
+//     }
+
+//     const existing = await Application.findOne({ job: jobId, user: userId });
+//     if (existing) {
+//       return res.status(400).json({ message: "You already applied to this job" });
+//     }
+
+//     const newApplication = new Application({
+//       job: jobId,
+//       user: userId,
+//     });
+
+//     await newApplication.save();
+
+//     res.status(200).json({ message: "Application submitted successfully" });
+//   } catch (error) {
+//     console.error("Apply Error:", error);
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+
+// const applyToJob = async (req, res) => {
+//   try {
+//     const jobId = req.params.id;
+//     const userId = req.user.userId || req.user.id;
+
+//     const job = await Job.findById(jobId);
+//     if (!job) {
+//       return res.status(404).json({ message: "Job not found" });
+//     }
+
+//     // Check if job has available posts
+//     if (job.jobpost <= 0) {
+//       return res.status(400).json({ message: "No more positions available for this job" });
+//     }
+
+//     const existing = await Application.findOne({ job: jobId, user: userId });
+//     if (existing) {
+//       return res.status(400).json({ message: "You already applied to this job" });
+//     }
+
+//     // Create new application
+//     const newApplication = new Application({
+//       job: jobId,
+//       user: userId,
+//     });
+//     await newApplication.save();
+
+//     // Reduce remaining posts by 1
+//     job.jobpost -= 1;
+//     await job.save();
+
+//     res.status(200).json({ message: "Application submitted successfully" });
+//   } catch (error) {
+//     console.error("Apply Error:", error);
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
+
 const applyToJob = async (req, res) => {
   try {
     const jobId = req.params.id;
-    const userId = req.user.userId || req.user.id; // depending on your token payload
+    const userId = req.user.userId || req.user.id;
 
     const job = await Job.findById(jobId);
     if (!job) {
       return res.status(404).json({ message: "Job not found" });
+    }
+
+    if (job.jobpost <= 0) {
+      return res.status(400).json({ message: "No more positions available for this job" });
     }
 
     const existing = await Application.findOne({ job: jobId, user: userId });
@@ -620,10 +704,16 @@ const applyToJob = async (req, res) => {
       job: jobId,
       user: userId,
     });
-
     await newApplication.save();
 
-    res.status(200).json({ message: "Application submitted successfully" });
+    job.jobpost -= 1;
+    await job.save();
+
+    // ✅ Send updated job info to frontend
+    res.status(200).json({
+      message: "Application submitted successfully",
+      updatedJob: job
+    });
   } catch (error) {
     console.error("Apply Error:", error);
     res.status(500).json({ message: error.message });
@@ -771,7 +861,7 @@ const getJobsBySubcategory = async (req, res) => {
 // Get pending jobs (for admin)
 const getPendingJobs = async (req, res) => {
   try {
-    if (!req.user?.isAdmin) {
+    if (req.user?.isAdmin) {
       return res.status(403).json({ message: "Unauthorized" });
     }
     

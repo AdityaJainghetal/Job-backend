@@ -56,11 +56,11 @@ const jobSchema = new mongoose.Schema({
   },
   experience: {
     type: String,
-    required: true,
+    // required: true,
   },
   deadline: {
     type: String,
-    required: true,
+    // required: true,
   },
   description: {
     type: String,
@@ -76,7 +76,7 @@ const jobSchema = new mongoose.Schema({
   },
   jobpost: {
     type: Number,
-    required: true,
+    // required: true,
   },
   category: {
     type: mongoose.Schema.Types.ObjectId,
