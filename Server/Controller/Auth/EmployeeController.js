@@ -174,8 +174,8 @@ const loginEmployee = async (req, res) => {
       token,
       employee: {
         id: employee._id,
-        name: employee.name,
-        email: employee.email,
+        // name: employee.name,
+        // email: employee.email,
         companyName: employee.companyName,
         ProfilePhoto: employee.ProfilePhoto,
         Coverphoto: employee.Coverphoto,

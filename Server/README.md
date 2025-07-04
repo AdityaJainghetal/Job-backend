@@ -1,5 +1,844 @@
 # 🛡️ Auth API Routes – Express.js
 
+
+# 🖥️ Job Category Management – Frontend
+
+A frontend web interface to manage **Job Categories** such as **IT, Finance, Healthcare**, etc. Built using **React.js**, and connected to a RESTful backend API.
+
+---
+
+## 🎯 Features
+
+* 📝 Add new job categories
+* 📋 View all categories
+* 🔍 View category by ID
+* ✏️ Update category name
+* 🗑️ Delete existing categories
+* 🔌 Connected to a Node.js backend
+
+---
+
+## ⚙️ Tech Stack
+
+* React.js (or Next.js)
+* Axios for API calls
+* React Router (if routing required)
+* Tailwind CSS or Bootstrap (for styling)
+* Toast notifications (optional)
+
+---
+
+## 📁 Folder Structure (React)
+
+```
+src/
+│
+├── components/
+│   ├── CategoryList.js
+│   ├── CategoryForm.js
+│   └── CategoryCard.js
+│
+├── pages/
+│   └── CategoryPage.js
+│
+├── services/
+│   └── categoryService.js
+│
+├── App.js
+└── index.js
+```
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the project
+
+```bash
+git clone <your-frontend-repo-url>
+cd job-category-frontend
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Set the backend API URL
+
+Create a `.env` file in the root:
+
+```env
+REACT_APP_API_BASE_URL=http://localhost:5000/category
+```
+
+### 4. Start the React app
+
+```bash
+npm start
+```
+
+---
+
+## 🔌 API Integration (categoryService.js)
+
+```js
+import axios from 'axios';
+
+const API_URL = process.env.REACT_APP_API_BASE_URL;
+
+export const getAllCategories = () => axios.get(API_URL);
+export const getCategoryById = (id) => axios.get(`${API_URL}/${id}`);
+export const createCategory = (data) => axios.post(API_URL, data);
+export const updateCategory = (id, data) => axios.put(`${API_URL}/${id}`, data);
+export const deleteCategory = (id) => axios.delete(`${API_URL}/${id}`);
+```
+
+---
+
+## 🧪 Example Usage in Component
+
+```js
+// CategoryForm.js
+import { useState } from "react";
+import { createCategory } from "../services/categoryService";
+
+function CategoryForm() {
+  const [name, setName] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await createCategory({ name });
+      alert("Category created!");
+      setName("");
+    } catch (err) {
+      alert("Failed to create category");
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        value={name}
+        placeholder="Enter category name"
+        onChange={(e) => setName(e.target.value)}
+        required
+      />
+      <button type="submit">Add Category</button>
+    </form>
+  );
+}
+```
+
+---
+
+## ✅ Example Success Response
+
+```json
+{
+  "_id": "66ae1d4fc1924d27b1dfce62",
+  "name": "Marketing",
+  "createdAt": "2025-07-04T08:00:00.000Z"
+}
+```
+
+---
+
+## ❌ Error Handling (Frontend)
+
+| Situation                | Message Displayed            | API Status |
+| ------------------------ | ---------------------------- | ---------- |
+| Empty input              | “Please enter category name” | Frontend   |
+| Duplicate / server error | “Failed to create category”  | 500        |
+| Not Found                | “Category not found”         | 404        |
+
+Use toast or modal libraries (e.g. `react-toastify`) for better UX.
+
+---
+
+## 🧑‍💻 Developer Notes
+
+* Integrate form validation using libraries like `Formik + Yup`
+* Improve design with `Tailwind`, `Bootstrap`, or `Ant Design`
+* Handle API errors with centralized error handlers
+* Optionally use Redux or React Query for state management
+
+---
+
+## 🔗 Connect With Backend
+
+* Ensure backend is running on: `http://localhost:5000`
+* All API calls from frontend are routed through `/category`
+* Use `Proxy` or `.env` to configure base URL properly
+
+---
+
+## 💡 Future Enhancements
+
+* Add pagination to list view
+* Implement search functionality
+* Add subcategories support
+* Role-based access with login
+
+
+
+
+
+
+# 🖥️ Job SubCategory Management – Frontend
+
+A frontend module for managing **Job Subcategories** (like "Frontend Development" under "IT"). Built using **React.js** and integrated with a RESTful backend API.
+
+---
+
+## 🎯 Features
+
+* 📝 Add new subcategories
+* 📋 View all subcategories
+* 🔍 View subcategory by ID
+* ✏️ Update subcategory
+* 🗑️ Delete subcategory
+* 🔌 Linked with job categories using `categoryId`
+
+---
+
+## ⚙️ Tech Stack
+
+* React.js
+* Axios for API calls
+* Tailwind CSS or Bootstrap
+* React Router (if needed)
+
+---
+
+## 📁 Folder Structure (React)
+
+```
+src/
+│
+├── components/
+│   ├── SubcategoryList.js
+│   ├── SubcategoryForm.js
+│   └── SubcategoryCard.js
+│
+├── services/
+│   └── subcategoryService.js
+│
+├── App.js
+└── index.js
+```
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the project
+
+```bash
+git clone <your-frontend-repo-url>
+cd job-subcategory-frontend
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Set the backend API URL
+
+Create a `.env` file:
+
+```env
+REACT_APP_SUBCATEGORY_API=http://localhost:5000/subcategory
+```
+
+### 4. Start the App
+
+```bash
+npm start
+```
+
+---
+
+## 🔌 API Integration (subcategoryService.js)
+
+```js
+import axios from 'axios';
+
+const BASE_URL = process.env.REACT_APP_SUBCATEGORY_API;
+
+export const getAllSubcategories = () => axios.get(BASE_URL);
+export const getSubcategoryById = (id) => axios.get(`${BASE_URL}/${id}`);
+export const createSubcategory = (data) => axios.post(BASE_URL, data);
+export const updateSubcategory = (id, data) => axios.put(`${BASE_URL}/${id}`, data);
+export const deleteSubcategory = (id) => axios.delete(`${BASE_URL}/${id}`);
+```
+
+---
+
+## 🧪 Example Usage in Component
+
+```js
+// SubcategoryForm.js
+import { useState, useEffect } from 'react';
+import { createSubcategory } from '../services/subcategoryService';
+
+function SubcategoryForm({ categories }) {
+  const [name, setName] = useState('');
+  const [category, setCategory] = useState('');
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await createSubcategory({ name, category });
+      alert('Subcategory created');
+      setName('');
+      setCategory('');
+    } catch (err) {
+      alert('Error creating subcategory');
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        type="text"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Subcategory Name"
+        required
+      />
+      <select value={category} onChange={(e) => setCategory(e.target.value)} required>
+        <option value="">Select Category</option>
+        {categories.map((cat) => (
+          <option key={cat._id} value={cat._id}>{cat.name}</option>
+        ))}
+      </select>
+      <button type="submit">Add Subcategory</button>
+    </form>
+  );
+}
+```
+
+---
+
+## ✅ Example Success Response
+
+```json
+{
+  "_id": "66ae1f03c1924d27b1dfce99",
+  "name": "Frontend Development",
+  "category": "66ae1e89c1924d27b1dfce63",
+  "createdAt": "2025-07-04T08:10:00.000Z"
+}
+```
+
+---
+
+## ❌ Error Handling
+
+| Situation           | Message                   | Status   |
+| ------------------- | ------------------------- | -------- |
+| Empty input         | "Please enter all fields" | Frontend |
+| Invalid category ID | "Category not found"      | 404      |
+| Server error        | "Internal Server Error"   | 500      |
+
+---
+
+## 🧑‍💻 Developer Notes
+
+* Fetch `categories` first for dropdowns
+* Use `useEffect` to preload dropdowns
+* Consider showing `category.name` using `populate()` in backend
+* Use `react-toastify` for alerts
+
+---
+
+## 🔗 Connect With Backend
+
+In `app.js`:
+
+```js
+app.use('/subcategory', SubCategoryRoute);
+```
+
+In `SubCategoryRoute.js`:
+
+```js
+router.get('/', getAllSubcategorys);
+router.get('/:id', getSubcategoryById);
+router.post('/', createSubcategory);
+router.put('/:id', updateSubcategory);
+router.delete('/:id', deleteSubcategory);
+```
+
+---
+
+## 💡 Future Enhancements
+
+* Add filter by category
+* Show subcategory count under each category
+* Add pagination and search bar
+* Improve error display
+
+
+
+
+
+
+
+
+# 🖥️ Job Management System – Frontend
+
+A frontend platform for managing and applying to job postings. Connected to a Node.js/Express backend with RESTful APIs. Supports categories, subcategories, user authentication, and admin access.
+
+---
+
+## 🎯 Features
+
+* 📅 Post new jobs (authenticated)
+* 📋 View all jobs (public)
+* 🔍 Filter jobs by category and subcategory
+* ✍️ Apply to a job (user only)
+* 🔐 Admin dashboard for job approval
+* 🚗 Payment verification endpoint
+* ✨ File (PDF) upload support
+
+---
+
+## ⚙️ Tech Stack
+
+* React.js
+* Axios for API calls
+* Tailwind CSS or Bootstrap
+* JWT for auth (via backend)
+* Toast/Alerts for notifications
+
+---
+
+## 📁 Folder Structure
+
+```
+src/
+├── pages/
+│   ├── JobList.js
+│   ├── JobDetail.js
+│   ├── PostJob.js
+│   └── MyJobs.js
+│
+├── components/
+│   ├── JobCard.js
+│   ├── JobForm.js
+│   └── JobFilters.js
+│
+├── services/
+│   └── jobService.js
+├── App.js
+└── index.js
+```
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone and Install
+
+```bash
+git clone <your-frontend-repo-url>
+cd job-frontend
+npm install
+```
+
+### 2. Add Environment Variables
+
+```env
+REACT_APP_JOB_API=http://localhost:5000/api
+```
+
+### 3. Start React App
+
+```bash
+npm start
+```
+
+---
+
+## 🔌 API Integration (jobService.js)
+
+```js
+import axios from 'axios';
+const BASE = process.env.REACT_APP_JOB_API;
+
+export const getAllJobs = () => axios.get(`${BASE}/`);
+export const getJobById = (id) => axios.get(`${BASE}/${id}`);
+export const getJobsByCategory = (categoryId) => axios.get(`${BASE}/category/${categoryId}`);
+export const getJobsBySubcategory = (subcategoryId) => axios.get(`${BASE}/subcategory/${subcategoryId}`);
+export const createJob = (data, token) => axios.post(`${BASE}/`, data, { headers: { Authorization: `Bearer ${token}` } });
+export const updateJob = (id, data, token) => axios.put(`${BASE}/${id}`, data, { headers: { Authorization: `Bearer ${token}` } });
+export const deleteJob = (id, token) => axios.delete(`${BASE}/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+export const applyToJob = (id, token, body) => axios.post(`${BASE}/${id}/apply`, body, { headers: { Authorization: `Bearer ${token}` } });
+export const verifyPayment = (data, token) => axios.post(`${BASE}/verify-payment`, data, { headers: { Authorization: `Bearer ${token}` } });
+export const getMyPostedJobs = (token) => axios.get(`${BASE}/myjobs/applications`, { headers: { Authorization: `Bearer ${token}` } });
+```
+
+---
+
+## 🧪 Job Post Form Example
+
+```js
+function JobForm({ categories, subcategories }) {
+  const [form, setForm] = useState({
+    company: '', location: '', phone: '', salaryMin: '', salaryMax: '', experience: '',
+    deadline: '', description: '', jobpost: '', category: '', subCategory: ''
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+    try {
+      await createJob(form, token);
+      alert("Job Posted Successfully");
+    } catch (err) {
+      alert("Error Posting Job");
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input type="text" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} placeholder="Company" required />
+      {/* other fields */}
+      <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
+        {categories.map(cat => <option key={cat._id} value={cat._id}>{cat.name}</option>)}
+      </select>
+      <button type="submit">Post Job</button>
+    </form>
+  );
+}
+```
+
+---
+
+## ✅ Job Schema (Backend Model)
+
+```js
+const jobSchema = new mongoose.Schema({
+  company: { type: String, required: true },
+  location: { type: String, required: true },
+  phone: { type: Number, required: true },
+  salaryMin: { type: Number, required: true },
+  salaryMax: { type: Number, required: true },
+  experience: { type: String, required: true },
+  deadline: { type: String, required: true },
+  description: { type: String, required: true },
+  responsibilities: [String],
+  requirements: [String],
+  jobpost: { type: Number, required: true },
+  category: { type: mongoose.Schema.Types.ObjectId, ref: "Category" },
+  subCategory: { type: mongoose.Schema.Types.ObjectId, ref: "SubCategory" },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  pdfUrl: String,
+  status: { type: String, enum: ["pending", "approved", "rejected"], default: "pending" },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
+});
+```
+
+---
+
+## ❌ Error Handling (Frontend)
+
+| Scenario               | Message                  | Status   |
+| ---------------------- | ------------------------ | -------- |
+| Missing fields         | "Please fill all fields" | Frontend |
+| Unauthorized           | "Login required"         | 401      |
+| Forbidden (admin-only) | "Access denied"          | 403      |
+| Server error           | "Something went wrong"   | 500      |
+
+---
+
+## 🔗 Backend Route Entry
+
+In `app.js`:
+
+```js
+app.use("/api", jobRoute);
+```
+
+All requests like `/api/:id`, `/api/category/:categoryId`, `/api/:id/apply` will work automatically.
+
+---
+
+## 💡 Future Ideas
+
+* Resume Upload for Applicants
+* Bookmark/Save Jobs
+* Pagination and Search Filters
+* Email Notification on Application
+* Employer Dashboard with stats
+
+
+
+
+
+
+# 🖥️ Job Management System – Frontend
+
+A frontend platform for managing and applying to job postings. Connected to a Node.js/Express backend with RESTful APIs. Supports categories, subcategories, user authentication, admin access, and Razorpay payments.
+
+---
+
+## 🎯 Features
+
+* 📅 Post new jobs (authenticated)
+* 📋 View all jobs (public)
+* 🔍 Filter jobs by category and subcategory
+* ✍️ Apply to a job (user only)
+* 🔐 Admin dashboard for job approval
+* ✨ File (PDF) upload support
+* 💳 Razorpay payment integration for job posts
+
+---
+
+## ⚙️ Tech Stack
+
+* React.js
+* Axios for API calls
+* Tailwind CSS or Bootstrap
+* JWT for auth (via backend)
+* Toast/Alerts for notifications
+
+---
+
+## 📁 Folder Structure
+
+```
+src/
+├── pages/
+│   ├── JobList.js
+│   ├── JobDetail.js
+│   ├── PostJob.js
+│   ├── MyJobs.js
+│   └── PaymentConfirm.js
+│
+├── components/
+│   ├── JobCard.js
+│   ├── JobForm.js
+│   └── JobFilters.js
+│
+├── services/
+│   ├── jobService.js
+│   └── paymentService.js
+├── App.js
+└── index.js
+```
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone and Install
+
+```bash
+git clone <your-frontend-repo-url>
+cd job-frontend
+npm install
+```
+
+### 2. Add Environment Variables
+
+```env
+REACT_APP_JOB_API=http://localhost:5000/api
+```
+
+### 3. Start React App
+
+```bash
+npm start
+```
+
+---
+
+## 🔌 API Integration (jobService.js & paymentService.js)
+
+**jobService.js:**
+
+```js
+import axios from 'axios';
+const BASE = process.env.REACT_APP_JOB_API;
+
+export const getAllJobs = () => axios.get(`${BASE}/`);
+export const getJobById = (id) => axios.get(`${BASE}/${id}`);
+export const getJobsByCategory = (categoryId) => axios.get(`${BASE}/category/${categoryId}`);
+export const getJobsBySubcategory = (subcategoryId) => axios.get(`${BASE}/subcategory/${subcategoryId}`);
+export const createJob = (data, token) => axios.post(`${BASE}/`, data, { headers: { Authorization: `Bearer ${token}` } });
+export const updateJob = (id, data, token) => axios.put(`${BASE}/${id}`, data, { headers: { Authorization: `Bearer ${token}` } });
+export const deleteJob = (id, token) => axios.delete(`${BASE}/${id}`, { headers: { Authorization: `Bearer ${token}` } });
+export const applyToJob = (id, token, body) => axios.post(`${BASE}/${id}/apply`, body, { headers: { Authorization: `Bearer ${token}` } });
+export const verifyPayment = (data, token) => axios.post(`${BASE}/verify-payment`, data, { headers: { Authorization: `Bearer ${token}` } });
+export const getMyPostedJobs = (token) => axios.get(`${BASE}/myjobs/applications`, { headers: { Authorization: `Bearer ${token}` } });
+```
+
+**paymentService.js:**
+
+```js
+import axios from 'axios';
+const BASE = process.env.REACT_APP_JOB_API;
+
+export const initiateCheckout = (data) => axios.post(`${BASE}/verify`, data);
+export const confirmOrder = (data) => axios.post(`${BASE}/confirm-order`, data);
+export const sendResetPassword = (data) => axios.post(`${BASE}/resetpassword`, data);
+export const getResetLink = (id) => axios.get(`${BASE}/reset-password/${id}`);
+```
+
+---
+
+## 🧪 Job Post Form Example
+
+```js
+function JobForm({ categories, subcategories }) {
+  const [form, setForm] = useState({
+    company: '', location: '', phone: '', salaryMin: '', salaryMax: '', experience: '',
+    deadline: '', description: '', jobpost: '', category: '', subCategory: ''
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+    try {
+      await createJob(form, token);
+      alert("Job Posted Successfully");
+    } catch (err) {
+      alert("Error Posting Job");
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input type="text" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} placeholder="Company" required />
+      {/* other fields */}
+      <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
+        {categories.map(cat => <option key={cat._id} value={cat._id}>{cat.name}</option>)}
+      </select>
+      <button type="submit">Post Job</button>
+    </form>
+  );
+}
+```
+
+---
+
+## 📅 Order Schema (Backend Model)
+
+```js
+const orderSchema = new mongoose.Schema({
+  orderId: { type: String, required: true, unique: true },
+  jobId: { type: mongoose.Schema.Types.ObjectId, ref: "Job", required: true },
+  company: { type: String, required: true },
+  amount: { type: Number, required: true },
+  currency: { type: String, required: true },
+  status: { type: String, enum: ["created", "paid", "failed"], default: "created" },
+  receipt: { type: String, required: true },
+  paymentId: { type: String },
+  signature: { type: String },
+  createdAt: { type: Date, default: Date.now },
+});
+```
+
+---
+
+## ❌ Error Handling (Frontend)
+
+| Scenario               | Message                       | Status   |
+| ---------------------- | ----------------------------- | -------- |
+| Missing fields         | "Please fill all fields"      | Frontend |
+| Unauthorized           | "Login required"              | 401      |
+| Forbidden (admin-only) | "Access denied"               | 403      |
+| Payment Failure        | "Payment verification failed" | 400/500  |
+| Server error           | "Something went wrong"        | 500      |
+
+---
+
+## 🔗 Backend Route Entry
+
+In `app.js`:
+
+```js
+app.use("/api", jobRoute);         // All job-related routes
+app.use("/api", paymentRoute);     // All payment-related routes under /api
+```
+
+### `/api` Routes
+
+* `POST /api/verify` – Start Razorpay checkout
+* `POST /api/confirm-order` – Confirm payment and update DB
+* `POST /api/resetpassword` – Initiate password reset email
+* `GET /api/reset-password/:id` – Retrieve reset form link
+
+---
+
+## 💡 Future Ideas
+
+* Razorpay refund API
+* OTP + email verification
+* Auto-payment success redirect
+* UI for payment history
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 This API provides authentication routes for registering an admin, logging in, and handling password resets.
 
 ---
