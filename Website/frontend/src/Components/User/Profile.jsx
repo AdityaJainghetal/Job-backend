@@ -28,7 +28,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="p-6 bg-white shadow-md rounded-lg max-w-4xl mx-auto mt-4">
+    <div className="p-6 mb-8 bg-white shadow-md rounded-lg max-w-4xl mx-auto mt-4">
       <h2 className="text-3xl font-bold text-blue-600 mb-6 text-center">
         User Profile
       </h2>

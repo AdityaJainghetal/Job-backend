@@ -27,23 +27,26 @@ const getSubcategoryById = async (req, res) => {
 const createSubcategory = async (req, res) => {
   try {
     const { name, category } = req.body;
-    const file = req.files?.images;
+    // const file = req.files?.images;
 
-    if (!file) {
-      return res.status(400).json({ message: "Image is required." });
-    }
+    // if (!file) {
+    //   return res.status(400).json({ message: "Image is required." });
+    // }
 
     // Upload image to ImageKit
-    const uploadResponse = await imagekit.upload({
-      file: file.data,
-      fileName: file.name,
-    });
+    // const uploadResponse = await imagekit.upload({
+    //   file: file.data,
+    //   fileName: file.name,
+    // });
 
     // Create new subcategory with image URL
+    console.log(category, "subcategory");
+    
     const newSubcategory = new Subcategory({
       name,
       category,
-      image: uploadResponse.url, // Save only the image URL
+      
+    //   image: uploadResponse.url, // Save only the image URL
     });
 
     await newSubcategory.save();

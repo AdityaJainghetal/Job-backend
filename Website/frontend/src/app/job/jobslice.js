@@ -8,7 +8,7 @@ import {
   updateJob,
   deleteJob,
   applyToJob,
-    
+  fetchApplications,
 } from './thunak';
 
 const jobSlice = createSlice({
@@ -16,14 +16,24 @@ const jobSlice = createSlice({
   initialState: {
     jobs: [],
     job: null,
+    applications: [], // 👈 New state to store applications
     loading: false,
     error: null,
+    successMessage: null,
   },
-  reducers: {},
-
+  reducers: {
+    // 👇 Approve/Reject reducers (frontend only)
+    approveApplication(state, action) {
+      const app = state.applications.find((a) => a._id === action.payload);
+      if (app) app.status = "Approved";
+    },
+    rejectApplication(state, action) {
+      const app = state.applications.find((a) => a._id === action.payload);
+      if (app) app.status = "Rejected";
+    },
+  },
   extraReducers: (builder) => {
     builder
-
       // ✅ Fetch all jobs
       .addCase(fetchAllJobs.pending, (state) => {
         state.loading = true;
@@ -118,28 +128,36 @@ const jobSlice = createSlice({
         state.error = action.payload;
       })
 
-      
+      // ✅ Apply to job
       .addCase(applyToJob.pending, (state) => {
-  state.loading = true;
-  state.error = null;
-})
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(applyToJob.fulfilled, (state, action) => {
+        state.loading = false;
+        state.successMessage = action.payload.message || "Applied Successfully";
+      })
+      .addCase(applyToJob.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload.message || "Failed to apply";
+      })
 
-.addCase(applyToJob.fulfilled, (state, action) => {
-  state.loading = false;
-  state.successMessage = action.payload.message || "Applied Successfully";
-})
-.addCase(applyToJob.rejected, (state, action) => {
-  state.loading = false;
-  state.error = action.payload.message || "Failed to apply";
-});
-
-
-
-      
+      // ✅ Fetch Applications
+      .addCase(fetchApplications.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchApplications.fulfilled, (state, action) => {
+        state.loading = false;
+        state.applications = action.payload;
+      })
+      .addCase(fetchApplications.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
-
-
-
 });
+
+export const { approveApplication, rejectApplication } = jobSlice.actions;
 
 export default jobSlice.reducer;

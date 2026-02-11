@@ -34,6 +34,9 @@
 const mongoose = require("mongoose");
 
 const jobSchema = new mongoose.Schema({
+ tittle:{
+  type: String,
+ },
   company: {
     type: String,
     required: true,
@@ -42,6 +45,7 @@ const jobSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  
   phone:{
     type:Number,
     required:true

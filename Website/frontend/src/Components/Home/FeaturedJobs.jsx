@@ -30,14 +30,19 @@ const FeaturedJobs = () => {
   }, [dispatch]);
 
   // ✅ Call Now Handler
-  const handleCallNow = (id) => {
+
+
+ const handleCallNow = (id) => {
   const token = localStorage.getItem('token');
   if (token) {
     dispatch(applyToJob(id))
       .unwrap()
       .then(() => {
         alert('✅ Applied Successfully');
-        setAppliedJobs((prev) => [...prev, id]); // 👉 Mark this job as applied
+        setAppliedJobs((prev) => [...prev, id]);
+
+        // 👇 Apply होने के बाद Redux से jobs list दुबारा fetch
+        dispatch(fetchAllJobs());
       })
       .catch((err) => alert('❌ Apply Failed: ' + err.message));
   } else {
@@ -45,6 +50,7 @@ const FeaturedJobs = () => {
     setIsOpen(true);
   }
 };
+
 
 
   // ✅ Login Handler
@@ -122,17 +128,40 @@ const FeaturedJobs = () => {
                 {job.location}
               </p>
               <p className="flex items-center">
-                <FaClock className="mr-2 text-[#0077B6]" /> {job.experience}
+                <FaClock className="mr-2 text-[#0077B6]" /> {job?.experience || "Fresher"}
               </p>
               <p className="flex items-center">
                 <FaBriefcase className="mr-2 text-[#0077B6]" /> {job.salaryMin}
               </p>
+            <p className="flex items-center text-gray-600">
+  <FaClock className="mr-2 text-[#0077B6]" />
+  {job.createdAt
+    ? (() => {
+        const now = new Date();
+        const posted = new Date(job.createdAt);
+        const diffMs = now - posted;
+        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+
+        if (diffHours < 24) {
+          return `${diffHours} hour${diffHours !== 1 ? "s" : ""} `;
+        } else {
+          const diffDays = Math.floor(diffHours / 24);
+          return `${diffDays} day${diffDays !== 1 ? "s" : ""} `;
+        }
+      })()
+    : "Just now"}
+</p>
+
             </div>
 
             <div className="flex flex-wrap gap-2 mb-4">
-              <span className="bg-[#F0F4F8] flex text-gray-700 text-xs px-2 py-1 rounded-full">
-                {job.jobpost}
-              </span>
+              <p className="flex items-center">
+               <div className="flex items-center ">
+  <FaBriefcase className="mr-2 text-[#0077B6]" /> {job?.jobpost}
+</div>
+
+
+              </p>
               {job.urgent && (
                 <span className="bg-[#FFE5E5] text-[#E63946] text-xs px-2 py-1 rounded-full flex items-center">
                   <FaFire className="mr-1" /> Urgent

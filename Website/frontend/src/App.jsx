@@ -20,6 +20,7 @@ import UserList from './Components/UserList'
 import EmployerRegister from './pages/EmployerRegister'
 import Forgot from './pages/Forgot'
 import RegisterLogin from './pages/RegisterLogin'
+import Dashboard from './Components/admin/Dashboard'
 // Add more pages as needed
 
 
@@ -51,6 +52,8 @@ const App = () => {
                 
             <Route path="/recruiting" element={<RecruitingSection />} />
             {/* Add more <Route /> elements here for other pages */}
+            <Route path="/adminpanel" element={<Dashboard />} />
+
           </Routes>
         </div>
 

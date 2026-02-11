@@ -3,6 +3,8 @@ import userReducer from './users/userSlice';
 import  authReducer from './users/authSlice';
 import employeReducer from './Employe/employeSlice';
 import  jobSlice from "../app/job/jobslice"
+import  categoryReducer   from '../app/categories/categoryslice';
+import subcategoryReducer from "../app/subcategories/subcategorySlice";
 
 
 export const store = configureStore({
@@ -10,7 +12,10 @@ export const store = configureStore({
     users: userReducer,
     auth: authReducer,
     job: jobSlice, 
-    employe: employeReducer
+    employe: employeReducer,
+    categories: categoryReducer,
+    subcategories: subcategoryReducer,
+
     
   },
 

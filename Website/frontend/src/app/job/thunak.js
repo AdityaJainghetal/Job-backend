@@ -107,3 +107,18 @@ export const applyToJob = createAsyncThunk(
     }
   }
 );
+
+
+export const fetchApplications = createAsyncThunk(
+  "applications/fetchAll",
+  async (_, thunkAPI) => {
+    try {
+      const res = await axios.get("/api/myjobs/applications"); // 👈 api prefix
+      return res.data.data; // backend success:true,data:{} format है
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.response?.data?.message || "Something went wrong");
+    }
+  }
+);
+
+

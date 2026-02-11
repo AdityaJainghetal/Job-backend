@@ -263,7 +263,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+// import 'react-toastify/dist/ReactToastify.css';
 
 const PostJob = () => {
   const API_URL = 'http://localhost:8000/api'; // Update with your actual API endpoint
@@ -272,7 +272,7 @@ const PostJob = () => {
 
   const [formData, setFormData] = useState({
     jobTitle: '',
-    // jobType: '',
+     jobpost : '',
     category: '',
     subcategory: '',
     company: '',
@@ -324,7 +324,7 @@ const PostJob = () => {
       if (formData.category) {
         try {
           setIsLoading(true);
-          const response = await axios.get(`${SUBCATEGORY_API}?category=${formData.category}`, {
+          const response = await axios.get(`${SUBCATEGORY_API}?category=${formData.category._id}`, {
             headers: {
               Authorization: `Bearer ${token}`
             }
@@ -365,8 +365,9 @@ const PostJob = () => {
       
       // Reset form after successful submission
       setFormData({
-        jobTitle: '',
+        Title: '',
         // jobType: '',
+         jobpost:"",
         category: '',
         subcategory: '',
         company: '',
@@ -407,6 +408,18 @@ const PostJob = () => {
               placeholder="e.g., Frontend Developer"
             />
           </div>
+          <div>
+  <label className="block text-sm font-semibold text-gray-700">No. of Job Post</label>
+  <input
+    type="number"
+    name="jobpost"
+    value={formData.jobpost}
+    onChange={handleChange}
+    required
+    className="mt-1 w-full border border-gray-300 rounded-md px-4 py-2"
+    placeholder="e.g., 101"
+  />
+</div>
           {/* <div>
             <label className="block text-sm font-semibold text-gray-700">Job Type</label>
             <select
@@ -416,6 +429,7 @@ const PostJob = () => {
               required
               className="mt-1 w-full border border-gray-300 rounded-md px-4 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#0077B6]"
             >
+            
               <option value="">Select Type</option>
               <option value="Full-Time">Full-Time</option>
               <option value="Part-Time">Part-Time</option>

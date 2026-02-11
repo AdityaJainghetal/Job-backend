@@ -232,6 +232,7 @@ const fileUpload = async (file) => {
 const createJob = async (req, res) => {
   try {
     const {
+      tittle,
       company,
       location,
       salaryMin,
@@ -246,6 +247,7 @@ const createJob = async (req, res) => {
       category,
       subCategory,
       position,
+
     } = req.body;
 
     // Count how many jobs already posted by this company
@@ -261,6 +263,7 @@ const createJob = async (req, res) => {
     }
 
     const newJob = new Job({
+      tittle,
       company,
       location,
       salaryMin,
